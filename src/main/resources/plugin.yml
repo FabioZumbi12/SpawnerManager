@@ -1,0 +1,24 @@
+name: SpawnerManager
+version: ${project.version}
+main: br.net.fabiozumbi12.spawnermanager.SpawnerManager
+api-version: 1.13
+authors: [FabioZumbi12]
+description: Plugin to manage the servers spawners
+commands:
+  spawnermanager:
+    aliases: [spm, silk]
+permissions:
+  spawnermanager.player:
+    default: op
+    children:
+      spawnermanager.place.all: true
+      spawnermanager.break.all: true
+      spawnermanager.break.experience: true
+      spawnermanager.break.drop: true
+      spawnermanager.break.drop.inventory: true
+  spawnermanager.admin:
+    default: op
+    children:
+      spawnermanager.player: true
+      spawnermanager.command.change: true
+      spawnermanager.command.give: true
