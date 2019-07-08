@@ -13,9 +13,11 @@ permissions:
     children:
       spawnermanager.place.all: true
       spawnermanager.break.all: true
+      spawnermanager.change.all: true
       spawnermanager.break.experience: true
       spawnermanager.break.drop: true
       spawnermanager.break.drop.inventory: true
+
   spawnermanager.admin:
     default: op
     children:
