@@ -1,8 +1,6 @@
 package br.net.fabiozumbi12.spawnermanager;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.enchantments.Enchantment;
@@ -36,11 +34,6 @@ public class SpawnerListener implements Listener {
 
         if (block.getType().equals(Material.SPAWNER) && block.getState() instanceof CreatureSpawner) {
 
-            if (!event.getPlayer().hasPermission("spawnermanager.place")) {
-                event.setCancelled(true);
-                return;
-            }
-
             EntityType entity;
             if (hand.hasItemMeta() && hand.getItemMeta().hasLore()) {
                 List<String> lore = hand.getItemMeta().getLore();
@@ -50,9 +43,22 @@ public class SpawnerListener implements Listener {
                 entity = EntityType.PIG;
             }
 
+            if (!event.getPlayer().hasPermission("spawnermanager.place.all") && !event.getPlayer().hasPermission("spawnermanager.place." + entity.name().toLowerCase())) {
+                event.setCancelled(true);
+                return;
+            }
+
             CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
             creatureSpawner.setSpawnedType(entity);
             creatureSpawner.update(true);
+
+            if (plugin.getConfig().getBoolean("config.logOnConsole")) {
+                Location loc = block.getLocation();
+                Bukkit.getConsoleSender().sendMessage(plugin.getLang("placed", false)
+                        .replace("{type}", plugin.capSpawnerName(entity.name()))
+                        .replace("{player}", event.getPlayer().getName())
+                        .replace("{location}", loc.getWorld().getName()+","+loc.getBlockX()+","+loc.getBlockY()+","+loc.getBlockZ()));
+            }
         }
     }
 
@@ -79,7 +85,7 @@ public class SpawnerListener implements Listener {
             // Check if can drop the spawner
             if (!player.hasPermission("spawnermanager.break.drop")) return;
 
-            if (validTool(player.getInventory().getItemInMainHand()) || validTool(player.getInventory().getItemInOffHand())) {
+            if (validTool(player.getInventory().getItemInMainHand())) {
                 ItemStack item = new ItemStack(Material.SPAWNER, 1);
                 plugin.setItemSpawnwer(item, type, player.getName());
 
@@ -93,9 +99,26 @@ public class SpawnerListener implements Listener {
                                     .replace("{spawner}",item.getAmount() + "x " + plugin.capSpawnerName(type)));
                         });
                     }
-                    return;
+                } else {
+                    player.getWorld().dropItemNaturally(block.getLocation(), item);
                 }
-                player.getWorld().dropItemNaturally(block.getLocation(), item);
+            }
+
+            if (plugin.getConfig().getBoolean("config.logOnConsole")) {
+                StringBuilder enchant = new StringBuilder();
+                if (player.getInventory().getItemInMainHand().getEnchantments().size() > 0) {
+                    enchant.append("[");
+                    for (Map.Entry<Enchantment, Integer> itEnchant : player.getInventory().getItemInMainHand().getEnchantments().entrySet()) {
+                        enchant.append(plugin.capSpawnerName(itEnchant.getKey().getKey().getKey().toUpperCase())).append(" ").append(itEnchant.getValue()).append(",");
+                    }
+                    enchant.delete(enchant.lastIndexOf(","), enchant.length()).append("]");
+                }
+                Location loc = block.getLocation();
+                Bukkit.getConsoleSender().sendMessage(plugin.getLang("broken", false)
+                        .replace("{type}", plugin.capSpawnerName(type))
+                        .replace("{player}", player.getName())
+                        .replace("{tool}", plugin.capSpawnerName(player.getInventory().getItemInMainHand().getType().name()) + enchant.toString())
+                        .replace("{location}", loc.getWorld().getName()+","+loc.getBlockX()+","+loc.getBlockY()+","+loc.getBlockZ()));
             }
         }
     }
@@ -129,6 +152,16 @@ public class SpawnerListener implements Listener {
                 }
                 if (!player.hasPermission("spawnermanager.change." + entity.toLowerCase()) && !player.hasPermission("spawnermanager.change.all")) {
                     event.setCancelled(true);
+                    return;
+                }
+
+                if (plugin.getConfig().getBoolean("config.logOnConsole")) {
+                    Location loc = block.getLocation();
+                    Bukkit.getConsoleSender().sendMessage(plugin.getLang("changed", false)
+                            .replace("{from}", plugin.capSpawnerName(((CreatureSpawner) block.getState()).getSpawnedType().name()))
+                            .replace("{to}", plugin.capSpawnerName(entity))
+                            .replace("{player}", event.getPlayer().getName())
+                            .replace("{location}", loc.getWorld().getName()+","+loc.getBlockX()+","+loc.getBlockY()+","+loc.getBlockZ()));
                 }
             }
         }

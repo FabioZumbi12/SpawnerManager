@@ -43,6 +43,7 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
         getConfig().set("config.allowedTools", getConfig().get("config.allowedTools", Collections.singletonList("DIAMOND_PICKAXE")));
         getConfig().set("config.allowedEnchants", getConfig().get("config.allowedEnchants", Collections.singletonList("SILK_TOUCH:1")));
         getConfig().set("config.setMinedByOnLore", getConfig().get("config.setMinedByOnLore", false));
+        getConfig().set("config.logOnConsole", getConfig().get("config.logOnConsole", true));
 
 
         getConfig().set("lang.prefix", getConfig().get("lang.prefix", "&7[&8SpawnManager&7]&r "));
@@ -58,6 +59,9 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
         getConfig().set("lang.alreadytype", getConfig().get("lang.alreadytype", "&cThis spawner is already the type of &6{type}"));
         getConfig().set("lang.spawnername", getConfig().get("lang.spawnername", "&2&lSpawner of &6&l{type}"));
         getConfig().set("lang.minedby", getConfig().get("lang.minedby", "&5> &aMined by {player}"));
+        getConfig().set("lang.placed", getConfig().get("lang.placed", "&2A spawner of &6{type} &2was placed by &6{player} &2on &6{location}"));
+        getConfig().set("lang.changed", getConfig().get("lang.changed", "&2The player &6{player} &2was changed a spawner type from &6{from} &2to &6{to} &2on &6{location}"));
+        getConfig().set("lang.broken", getConfig().get("lang.broken", "&2A spawner of &6{type} &2was broken by &6{player} &2using &6{tool} &2on &6{location}"));
         getConfig().set("lang.nospaceinventory", getConfig().get("lang.nospaceinventory", "&cYou have no more space available in your inventory. We throw &6{spawner} &cin your position!"));
         try {
             getConfig().save(config);
