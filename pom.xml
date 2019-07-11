@@ -42,7 +42,7 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <outputFile>
-                                ${project.basedir}/target/${project.name}-${project.version}-b${BUILD_NUMBER}-Universal.jar
+                                ${project.basedir}/target/${project.name}-${project.version}-b${BUILD_NUMBER}.jar
                             </outputFile>
                         </configuration>
                     </execution>
