@@ -147,9 +147,11 @@ public class SpawnerListener implements Listener {
             if (split.length == 2) {
                 Enchantment ench = Enchantment.getByKey(NamespacedKey.minecraft(split[0].toLowerCase()));
                 if (ench == null)
-                    return false;
-                return itemStack.containsEnchantment(ench) &&
-                        itemStack.getEnchantmentLevel(ench) == Integer.parseInt(split[1]);
+                    continue;
+                if (itemStack.containsEnchantment(ench) &&
+                        itemStack.getEnchantmentLevel(ench) == Integer.parseInt(split[1])) {
+                    return true;
+                }
             }
         }
         return false;
