@@ -250,7 +250,7 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
         ItemMeta meta = itemStack.getItemMeta();
         meta.setLore(Collections.singletonList("§0" + type));
         if (getConfig().getBoolean("config.setMinedByOnLore"))
-            meta.setLore(Arrays.asList("§0" + type, getConfig().getBoolean("config.setMinedByOnLore") ? getLang("minedby", false).replace("{player}", player):""));
+            meta.setLore(Arrays.asList("§0" + type, getLang("minedby", false).replace("{player}", player)));
         meta.setDisplayName(getLang("spawnername", false).replace("{type}", capSpawnerName(type)));
         itemStack.setItemMeta(meta);
     }
