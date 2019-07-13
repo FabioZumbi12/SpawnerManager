@@ -16,6 +16,8 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.permissions.Permission;
 
 import java.util.*;
 
@@ -48,6 +50,7 @@ public class SpawnerListener implements Listener {
                 return;
             }
 
+            block.setMetadata("mined", new FixedMetadataValue(plugin, true));
             CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
             creatureSpawner.setSpawnedType(entity);
             creatureSpawner.update(true);
@@ -78,29 +81,29 @@ public class SpawnerListener implements Listener {
             }
 
             // Check if can drop exp
-            if (!player.hasPermission("spawnermanager.break.experience")) {
+            if (!player.hasPermission("spawnermanager.break.experience") || isMined(block)) {
                 event.setExpToDrop(0);
             }
 
             // Check if can drop the spawner
-            if (!player.hasPermission("spawnermanager.break.drop")) return;
+            if (player.hasPermission("spawnermanager.break.drop")) {
 
-            if (validTool(player.getInventory().getItemInMainHand())) {
-                ItemStack item = new ItemStack(Material.SPAWNER, 1);
-                plugin.setItemSpawnwer(item, type, player.getName());
-
-                // Check if should put on inventory
-                if (player.hasPermission("spawnermanager.break.drop.inventory")){
-                    HashMap<Integer, ItemStack> items =player.getInventory().addItem(item);
-                    if (!items.isEmpty()) {
-                        items.values().forEach(v->{
-                            player.getWorld().dropItemNaturally(player.getLocation(), v);
-                            player.sendMessage(plugin.getLang("nospaceinventory", true)
-                                    .replace("{spawner}",item.getAmount() + "x " + plugin.capSpawnerName(type)));
-                        });
+                // Check drop chance
+                // Will set false only if the player has the chance perm and if not >= random
+                if (!isMined(block)) {
+                    int rand = new Random().nextInt(100) + 1;
+                    boolean canDrop = true;
+                    for (int i = 0; i <= 100; i++) {
+                        if (player.hasPermission("spawnermanager.break.drop.chance."+ type + "." + i) ||
+                                player.hasPermission("spawnermanager.break.drop.chance.all."+ i)) {
+                            canDrop = i >= rand;
+                        }
+                    }
+                    if (canDrop) {
+                        dropItem(player, type);
                     }
                 } else {
-                    player.getWorld().dropItemNaturally(block.getLocation(), item);
+                    dropItem(player, type);
                 }
             }
 
@@ -121,6 +124,32 @@ public class SpawnerListener implements Listener {
                         .replace("{location}", loc.getWorld().getName()+","+loc.getBlockX()+","+loc.getBlockY()+","+loc.getBlockZ()));
             }
         }
+    }
+
+    private void dropItem(Player player, String type) {
+        // Check valid tool to drop the item
+        if (validTool(player.getInventory().getItemInMainHand())) {
+            ItemStack item = new ItemStack(Material.SPAWNER, 1);
+            plugin.setItemSpawnwer(item, type, player.getName());
+
+            // Check if should put on inventory
+            if (player.hasPermission("spawnermanager.break.drop.inventory")){
+                HashMap<Integer, ItemStack> items =player.getInventory().addItem(item);
+                if (!items.isEmpty()) {
+                    items.values().forEach(v->{
+                        player.getWorld().dropItemNaturally(player.getLocation(), v);
+                        player.sendMessage(plugin.getLang("nospaceinventory", true)
+                                .replace("{spawner}",item.getAmount() + "x " + plugin.capSpawnerName(type)));
+                    });
+                }
+            } else {
+                player.getWorld().dropItemNaturally(player.getLocation(), item);
+            }
+        }
+    }
+
+    private boolean isMined(Block block) {
+        return !block.hasMetadata("mined") || !block.getMetadata("mined").get(0).asBoolean();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

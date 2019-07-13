@@ -17,10 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class SpawnerManager extends JavaPlugin implements CommandExecutor, TabCompleter {
@@ -63,6 +60,10 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
         getConfig().set("lang.changed", getConfig().get("lang.changed", "&2The player &6{player} &2was changed a spawner type from &6{from} &2to &6{to} &2on &6{location}"));
         getConfig().set("lang.broken", getConfig().get("lang.broken", "&2A spawner of &6{type} &2was broken by &6{player} &2using &6{tool} &2on &6{location}"));
         getConfig().set("lang.nospaceinventory", getConfig().get("lang.nospaceinventory", "&cYou have no more space available in your inventory. We throw &6{spawner} &cin your position!"));
+
+        getConfig().set("lang.notspawner", getConfig().get("lang.notspawner", "&cThis block is not a spawner"));
+        getConfig().set("lang.setwild", getConfig().get("lang.setwild", "&2Spawner set &6Wild &2with success!"));
+        getConfig().set("lang.notsetwild", getConfig().get("lang.notsetwild", "&cThis spawner is already a &6Wild &2spawner"));
         try {
             getConfig().save(config);
         } catch (IOException e) {
@@ -96,6 +97,25 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
         }
 
         if (args.length == 2 || args.length == 3) {
+
+            if (args.length == 2 && args[0].equalsIgnoreCase("setwild") && sender instanceof Player) {
+                if (!sender.hasPermission("spawnermanager.command.setwild")) return false;
+
+                Player player = (Player) sender;
+                Optional<Block> optSpawn = player.getLineOfSight(null, 15).stream().filter(e -> e.getType().equals(Material.SPAWNER)).findFirst();
+                if (optSpawn.isPresent()) {
+                    Block spawner = optSpawn.get();
+                    if (spawner.hasMetadata("mined")) {
+                        spawner.removeMetadata("mined", plugin);
+                        sender.sendMessage(getLang("setwild", true));
+                    } else {
+                        sender.sendMessage(getLang("notsetwild", true));
+                    }
+                } else {
+                    sender.sendMessage(getLang("notspawner", true));
+                }
+                return true;
+            }
 
             if (args[0].equalsIgnoreCase("change")) {
                 if (!sender.hasPermission("spawnermanager.command.change")) return false;
