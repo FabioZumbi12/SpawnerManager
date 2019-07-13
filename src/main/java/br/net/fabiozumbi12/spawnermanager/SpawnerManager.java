@@ -60,7 +60,6 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
         getConfig().set("lang.changed", getConfig().get("lang.changed", "&2The player &6{player} &2was changed a spawner type from &6{from} &2to &6{to} &2on &6{location}"));
         getConfig().set("lang.broken", getConfig().get("lang.broken", "&2A spawner of &6{type} &2was broken by &6{player} &2using &6{tool} &2on &6{location}"));
         getConfig().set("lang.nospaceinventory", getConfig().get("lang.nospaceinventory", "&cYou have no more space available in your inventory. We throw &6{spawner} &cin your position!"));
-
         getConfig().set("lang.notspawner", getConfig().get("lang.notspawner", "&cThis block is not a spawner"));
         getConfig().set("lang.setwild", getConfig().get("lang.setwild", "&2Spawner set &6Wild &2with success!"));
         getConfig().set("lang.notsetwild", getConfig().get("lang.notsetwild", "&cThis spawner is already a &6Wild &2spawner"));
@@ -152,7 +151,7 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
 
                 if (hand != null) {
                     setItemSpawnwer(hand, entity, player.getName());
-                    sender.sendMessage(getLang("setto", true).replace("{type}", hand.getAmount() + "x " +capSpawnerName(entity)));
+                    sender.sendMessage(getLang("setto", true).replace("{type}", hand.getAmount() + "x " + capSpawnerName(entity)));
                     return true;
                 }
 
