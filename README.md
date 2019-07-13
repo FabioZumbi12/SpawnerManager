@@ -10,4 +10,4 @@ Bukkit: https://dev.bukkit.org/projects/spawner-manager
 The source is available on GitHub: https://github.com/FabioZumbi12/SpawnerManager
 
 ## Dev builds: 
-Available on jenkins: [![Build Status](http://host.areaz12server.net.br:8080/buildStatus/icon?job=Spawner%20Manager)](http://host.areaz12server.net.br:8080/job/Spawner%20Manager/)
+Available on jenkins: [![Build Status](http://host.areaz12server.net.br:8080/buildStatus/icon?job=SpawnerManager)](http://host.areaz12server.net.br:8080/job/SpawnerManager/)
