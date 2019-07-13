@@ -42,7 +42,6 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
         getConfig().set("config.setMinedByOnLore", getConfig().get("config.setMinedByOnLore", false));
         getConfig().set("config.logOnConsole", getConfig().get("config.logOnConsole", true));
 
-
         getConfig().set("lang.prefix", getConfig().get("lang.prefix", "&7[&8SpawnManager&7]&r "));
         getConfig().set("lang.reloaded", getConfig().get("lang.reloaded", "&aSpawnerManager reloaded with success!"));
         getConfig().set("lang.onlyplayers", getConfig().get("lang.onlyplayers", "&cOnly players can use this command"));
@@ -93,11 +92,8 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
                 reloadConfig();
                 return true;
             }
-        }
 
-        if (args.length == 2 || args.length == 3) {
-
-            if (args.length == 2 && args[0].equalsIgnoreCase("setwild") && sender instanceof Player) {
+            if (args[0].equalsIgnoreCase("setwild") && sender instanceof Player) {
                 if (!sender.hasPermission("spawnermanager.command.setwild")) return false;
 
                 Player player = (Player) sender;
@@ -115,6 +111,9 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
                 }
                 return true;
             }
+        }
+
+        if (args.length == 2 || args.length == 3) {
 
             if (args[0].equalsIgnoreCase("change")) {
                 if (!sender.hasPermission("spawnermanager.command.change")) return false;
