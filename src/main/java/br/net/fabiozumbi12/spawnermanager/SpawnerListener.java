@@ -48,7 +48,11 @@ public class SpawnerListener implements Listener {
                 return;
             }
 
-            block.setMetadata("mined", new FixedMetadataValue(plugin, true));
+            // Set as Wild
+            if (!event.getPlayer().hasPermission("spawnermanager.place.wild")) {
+                block.setMetadata("mined", new FixedMetadataValue(plugin, true));
+            }
+
             CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
             creatureSpawner.setSpawnedType(entity);
             creatureSpawner.update(true);
