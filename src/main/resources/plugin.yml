@@ -4,6 +4,7 @@ main: br.net.fabiozumbi12.spawnermanager.SpawnerManager
 api-version: 1.13
 authors: [FabioZumbi12]
 description: Plugin to manage the servers spawners
+softdepend: [TranslationAPI]
 commands:
   spawnermanager:
     aliases: [spm, silk]

@@ -1,5 +1,6 @@
 package br.net.fabiozumbi12.spawnermanager;
 
+import br.net.fabiozumbi12.translationapi.TranslationAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -13,6 +14,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 
 public final class SpawnerManager extends JavaPlugin implements CommandExecutor, TabCompleter {
 
+    private static TranslationAPI tapi;
     private static SpawnerManager plugin;
     private File config = new File(getDataFolder(), "config.yml");
 
@@ -69,6 +72,12 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
         }
         getServer().getPluginManager().registerEvents(new SpawnerListener(this), this);
         getLogger().info("SpawnerManager loaded!");
+
+        Plugin p = Bukkit.getPluginManager().getPlugin("TranslationAPI");
+        if (p != null && p.isEnabled()) {
+            tapi = TranslationAPI.getAPI();
+            getLogger().info("Translation API found. We will use for spawner translations.");
+        }
     }
 
     String getLang(String key, boolean prefix) {
@@ -256,6 +265,17 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
     }
 
     String capSpawnerName(String name) {
+        if (tapi != null && tapi.isEnabled()) {
+            try {
+                return tapi.translateItem(Material.valueOf(name.toUpperCase()), "en-us", true);
+            } catch (Exception ex1) {
+                try {
+                    return tapi.translateEntity(EntityType.valueOf(name.toUpperCase()), "en-us", true);
+                } catch (Exception ex2) {
+                    return tapi.translateCustomType(name.toUpperCase(), "en-us", true);
+                }
+            }
+        }
         String[] split = name.split("_");
         StringBuilder finalName = new StringBuilder();
         for (String nm : split) {
