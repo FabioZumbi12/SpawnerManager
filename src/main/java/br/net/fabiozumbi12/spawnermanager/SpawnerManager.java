@@ -1,6 +1,7 @@
 package br.net.fabiozumbi12.spawnermanager;
 
 import br.net.fabiozumbi12.translationapi.TranslationAPI;
+import br.net.fabiozumbi12.translationapi.TranslationCore;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 
 public final class SpawnerManager extends JavaPlugin implements CommandExecutor, TabCompleter {
 
-    private static TranslationAPI tapi;
+    private static TranslationCore tapi;
     private static SpawnerManager plugin;
     private File config = new File(getDataFolder(), "config.yml");
 
@@ -265,7 +266,7 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
     }
 
     String capSpawnerName(String name) {
-        if (tapi != null && tapi.isEnabled()) {
+        if (tapi != null) {
             try {
                 return tapi.translateItem(Material.valueOf(name.toUpperCase()), "en-us", true);
             } catch (Exception ex1) {
