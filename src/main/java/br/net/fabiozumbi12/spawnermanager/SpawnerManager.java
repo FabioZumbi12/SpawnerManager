@@ -1,5 +1,6 @@
 package br.net.fabiozumbi12.spawnermanager;
 
+import br.net.fabiozumbi12.spawnermanager.metrics.Metrics;
 import br.net.fabiozumbi12.translationapi.TranslationAPI;
 import br.net.fabiozumbi12.translationapi.TranslationCore;
 import org.bukkit.Bukkit;
@@ -78,6 +79,15 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
         if (p != null && p.isEnabled()) {
             tapi = TranslationAPI.getAPI();
             getLogger().info("Translation API found. We will use for spawner translations.");
+        }
+
+        // Metrics
+        try {
+            Metrics metrics = new Metrics(this);
+            if (metrics.isEnabled())
+                getLogger().info("Metrics enabled! See our stats here: https://bstats.org/plugin/bukkit/SpawnerManager");
+        } catch (Exception ex) {
+            getLogger().info("Metrics not enabled due errors: " + ex.getLocalizedMessage());
         }
     }
 
