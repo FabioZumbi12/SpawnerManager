@@ -32,7 +32,7 @@ public class SpawnerListener implements Listener {
         Block block = event.getBlockPlaced();
         ItemStack hand = event.getItemInHand();
 
-        if (block.getType().equals(Material.SPAWNER) && block.getState() instanceof CreatureSpawner) {
+        if (block.getType().name().contains("SPAWNER") && block.getState() instanceof CreatureSpawner) {
 
             EntityType entity;
             if (hand.hasItemMeta() && hand.getItemMeta().hasLore()) {
@@ -72,7 +72,7 @@ public class SpawnerListener implements Listener {
         Block block = event.getBlock();
         Player player = event.getPlayer();
 
-        if (block.getType().equals(Material.SPAWNER) && block.getState() instanceof CreatureSpawner) {
+        if (block.getType().name().contains("SPAWNER") && block.getState() instanceof CreatureSpawner) {
             event.setDropItems(false);
             String type = ((CreatureSpawner) block.getState()).getSpawnedType().name();
 
@@ -131,7 +131,7 @@ public class SpawnerListener implements Listener {
     private void dropItem(Player player, String type) {
         // Check valid tool to drop the item
         if (validTool(player.getInventory().getItemInMainHand())) {
-            ItemStack item = new ItemStack(Material.SPAWNER, 1);
+            ItemStack item = new ItemStack(Arrays.stream(Material.values()).filter(m -> m.name().contains("SPAWNER")).findFirst().get(), 1);
             plugin.setItemSpawnwer(item, type, player.getName());
 
             // Check if should put on inventory
@@ -157,7 +157,7 @@ public class SpawnerListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCraftItem(InventoryClickEvent event) {
         if (event.getView().getType() == InventoryType.ANVIL) {
-            if (event.getInventory().getItem(2) != null && event.getInventory().getItem(2).getType().equals(Material.SPAWNER))
+            if (event.getInventory().getItem(2) != null && event.getInventory().getItem(2).getType().name().contains("SPAWNER"))
                 event.getInventory().setItem(2, new ItemStack(Material.AIR));
         }
     }
@@ -167,7 +167,7 @@ public class SpawnerListener implements Listener {
         Block block = event.getClickedBlock();
         Player player = event.getPlayer();
 
-        if (block != null && block.getType().equals(Material.SPAWNER)) {
+        if (block != null && block.getType().name().contains("SPAWNER")) {
             ItemStack egg = null;
             if (player.getInventory().getItemInMainHand().getType().name().endsWith("_EGG"))
                 egg = player.getInventory().getItemInMainHand();
