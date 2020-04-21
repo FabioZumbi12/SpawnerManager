@@ -46,6 +46,10 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
         getConfig().set("config.allowedEnchants", getConfig().get("config.allowedEnchants", Collections.singletonList("SILK_TOUCH:1")));
         getConfig().set("config.setMinedByOnLore", getConfig().get("config.setMinedByOnLore", false));
         getConfig().set("config.logOnConsole", getConfig().get("config.logOnConsole", true));
+        getConfig().set("config.disable.ENTITY_TYPE_NAME.spawn", getConfig().get("config.disable.ENTITY_TYPE_NAME.spawn", true));
+        getConfig().set("config.disable.ENTITY_TYPE_NAME.place", getConfig().get("config.disable.ENTITY_TYPE_NAME.place", true));
+        getConfig().set("config.disable.ENTITY_TYPE_NAME.break", getConfig().get("config.disable.ENTITY_TYPE_NAME.break", true));
+        getConfig().set("config.disable.ENTITY_TYPE_NAME.eggchange", getConfig().get("config.disable.ENTITY_TYPE_NAME.eggchange", true));
 
         getConfig().set("lang.prefix", getConfig().get("lang.prefix", "&7[&8SpawnManager&7]&r "));
         getConfig().set("lang.reloaded", getConfig().get("lang.reloaded", "&aSpawnerManager reloaded with success!"));
@@ -66,7 +70,8 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
         getConfig().set("lang.nospaceinventory", getConfig().get("lang.nospaceinventory", "&cYou have no more space available in your inventory. We throw &6{spawner} &cin your position!"));
         getConfig().set("lang.notspawner", getConfig().get("lang.notspawner", "&cThis block is not a spawner"));
         getConfig().set("lang.setwild", getConfig().get("lang.setwild", "&2Spawner set &6Wild &2with success!"));
-        getConfig().set("lang.notsetwild", getConfig().get("lang.notsetwild", "&cThis spawner is already a &6Wild &2spawner"));
+        getConfig().set("lang.notsetwild", getConfig().get("lang.notsetwild", "&cThis spawner is already a &6Wild &cspawner"));
+        getConfig().set("lang.cantchange", getConfig().get("lang.cantchange", "&cThis entity type cannot be changed: &6{type}"));
         try {
             getConfig().save(config);
         } catch (IOException e) {
@@ -117,7 +122,7 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
                 if (!sender.hasPermission("spawnermanager.command.setwild")) return false;
 
                 Player player = (Player) sender;
-                Optional<Block> optSpawn = player.getLineOfSight(null, 15).stream().filter(e -> e.getType().equals(Material.SPAWNER)).findFirst();
+                Optional<Block> optSpawn = player.getLineOfSight(null, 15).stream().filter(e -> e.getType().name().contains("SPAWNER")).findFirst();
                 if (optSpawn.isPresent()) {
                     Block spawner = optSpawn.get();
                     if (spawner.hasMetadata("mined")) {
@@ -163,9 +168,9 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
 
                 String entity = args[1].toUpperCase();
                 ItemStack hand = null;
-                if (player.getInventory().getItemInMainHand().getType().equals(Material.SPAWNER))
+                if (player.getInventory().getItemInMainHand().getType().name().contains("SPAWNER"))
                     hand = player.getInventory().getItemInMainHand();
-                else if (player.getInventory().getItemInOffHand().getType().equals(Material.SPAWNER))
+                else if (player.getInventory().getItemInOffHand().getType().name().contains("SPAWNER"))
                     hand = player.getInventory().getItemInOffHand();
 
                 if (hand != null) {
@@ -174,8 +179,8 @@ public final class SpawnerManager extends JavaPlugin implements CommandExecutor,
                     return true;
                 }
 
-                if (player.getLineOfSight(null, 15).stream().anyMatch(e -> e.getType().equals(Material.SPAWNER))) {
-                    Block spawner = player.getLineOfSight(null, 15).stream().filter(e -> e.getType().equals(Material.SPAWNER)).findFirst().get();
+                if (player.getLineOfSight(null, 15).stream().anyMatch(e -> e.getType().name().contains("SPAWNER"))) {
+                    Block spawner = player.getLineOfSight(null, 15).stream().filter(e -> e.getType().name().contains("SPAWNER")).findFirst().get();
                     CreatureSpawner creatureSpawner = (CreatureSpawner) spawner.getState();
                     creatureSpawner.setSpawnedType(EntityType.valueOf(entity));
                     creatureSpawner.update(true);

@@ -11,6 +11,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -21,10 +23,18 @@ import java.util.*;
 
 public class SpawnerListener implements Listener {
 
-    private SpawnerManager plugin;
+    private final SpawnerManager plugin;
 
     SpawnerListener(SpawnerManager plugin) {
         this.plugin = plugin;
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void EntitySpawn(SpawnerSpawnEvent event) {
+        // Check if is disabled
+        if (plugin.getConfig().getBoolean("config.disable." + event.getSpawner().getSpawnedType().name() + ".spawn", false)) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -43,6 +53,13 @@ public class SpawnerListener implements Listener {
                 entity = EntityType.PIG;
             }
 
+            // Check if is disabled
+            if (plugin.getConfig().getBoolean("config.disable." + entity.name() + ".place", false)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            // Check if can place
             if (!event.getPlayer().hasPermission("spawnermanager.place.all") && !event.getPlayer().hasPermission("spawnermanager.place." + entity.name().toLowerCase())) {
                 event.setCancelled(true);
                 return;
@@ -75,6 +92,12 @@ public class SpawnerListener implements Listener {
         if (block.getType().name().contains("SPAWNER") && block.getState() instanceof CreatureSpawner) {
             event.setDropItems(false);
             String type = ((CreatureSpawner) block.getState()).getSpawnedType().name();
+
+            // Check if is disabled
+            if (plugin.getConfig().getBoolean("config.disable." + type + ".break", false)) {
+                event.setCancelled(true);
+                return;
+            }
 
             // Check if can break
             if (!player.hasPermission("spawnermanager.break." + type.toLowerCase()) && !player.hasPermission("spawnermanager.break.all")) {
@@ -169,18 +192,34 @@ public class SpawnerListener implements Listener {
 
         if (block != null && block.getType().name().contains("SPAWNER")) {
             ItemStack egg = null;
-            if (player.getInventory().getItemInMainHand().getType().name().endsWith("_EGG"))
-                egg = player.getInventory().getItemInMainHand();
-            if (player.getInventory().getItemInOffHand().getType().name().endsWith("_EGG"))
-                egg = player.getInventory().getItemInOffHand();
+            try {
+                if (player.getInventory().getItemInMainHand().getType().name().endsWith("_EGG"))
+                    egg = player.getInventory().getItemInMainHand();
+                if (player.getInventory().getItemInOffHand().getType().name().endsWith("_EGG"))
+                    egg = player.getInventory().getItemInOffHand();
+            } catch (Exception ignored){
+                if (player.getItemInHand().getType().name().endsWith("_EGG"))
+                    egg = player.getInventory().getItemInOffHand();
+            }
+
             if (egg != null) {
                 String entity = egg.getType().name().split("_")[0];
 
+                // Check if is disabled
+                if (plugin.getConfig().getBoolean("config.disable." + entity + ".eggchange", false)) {
+                    player.sendMessage(plugin.getLang("cantchange", true).replace("{type}", SpawnerManager.get().capSpawnerName(entity)));
+                    event.setCancelled(true);
+                    return;
+                }
+
+                // Check if equals
                 if (((CreatureSpawner) block.getState()).getSpawnedType().name().equals(entity)) {
                     player.sendMessage(plugin.getLang("alreadytype", true).replace("{type}", SpawnerManager.get().capSpawnerName(entity)));
                     event.setCancelled(true);
                     return;
                 }
+
+                // Check if can change
                 if (!player.hasPermission("spawnermanager.change." + entity.toLowerCase()) && !player.hasPermission("spawnermanager.change.all")) {
                     event.setCancelled(true);
                     return;
