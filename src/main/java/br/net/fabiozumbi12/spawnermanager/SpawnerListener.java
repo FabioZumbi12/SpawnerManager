@@ -47,8 +47,13 @@ public class SpawnerListener implements Listener {
             EntityType entity;
             if (hand.hasItemMeta() && hand.getItemMeta().hasLore()) {
                 List<String> lore = hand.getItemMeta().getLore();
-                Optional<EntityType> oEntity = Arrays.stream(EntityType.values()).filter(e -> e.name().equals(ChatColor.stripColor(lore.get(0)))).findFirst();
-                entity = oEntity.orElse(EntityType.PIG);
+                String loreStr = ChatColor.stripColor(lore.get(0));
+                if (loreStr.equals("PIG_ZOMBIE") && Arrays.stream(EntityType.values()).noneMatch(e -> e.name().equals("PIG_ZOMBIE"))) {
+                    entity = EntityType.valueOf("ZOMBIFIED_PIGLIN");
+                } else {
+                    Optional<EntityType> oEntity = Arrays.stream(EntityType.values()).filter(e -> e.name().equals(loreStr)).findFirst();
+                    entity = oEntity.orElse(EntityType.PIG);
+                }
             } else {
                 entity = EntityType.PIG;
             }
